@@ -11,6 +11,8 @@ app = Celery(
     backend=settings.celery_result_backend,
 )
 
+import src.queue_consumer.consumer
+
 app.conf.update(
     task_serializer="json",
     accept_content=["json"],
@@ -22,4 +24,4 @@ app.conf.update(
     task_soft_time_limit=240,
 )
 
-logger.info("Celery app initialized", broker=settings.redis_url)
+logger.info("Celery app initialized with tasks", tasks=list(app.tasks.keys()))

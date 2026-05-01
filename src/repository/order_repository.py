@@ -2,19 +2,17 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from src.repository.database import AsyncSessionLocal
+from src.repository.database import SessionLocal
 from src.repository.models import Order, OrderState
 from src.utils.logger import logger
 
 
 class OrderRepository:
-    """Order state management"""
+    """Synchronous order state management"""
 
-    async def update_order_state(self, order_id: str, new_state: OrderState):
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(
-                select(Order).where(Order.order_id == order_id)
-            )
+    def update_order_state(self, order_id: str, new_state: OrderState):
+        with SessionLocal() as session:
+            result = session.execute(select(Order).where(Order.order_id == order_id))
             order = result.scalar_one_or_none()
 
             if not order:
@@ -29,5 +27,5 @@ class OrderRepository:
                 elif new_state == OrderState.RIDER_ASSIGNED:
                     order.rider_assigned_at = datetime.utcnow()
 
-            await session.commit()
+            session.commit()
             logger.info("Order state updated", order_id=order_id, state=new_state.value)
