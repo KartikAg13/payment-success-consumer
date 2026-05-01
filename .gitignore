@@ -12,3 +12,4 @@ wheels/
 .env
 orders.db
 uv.lock
+dump.rdb
